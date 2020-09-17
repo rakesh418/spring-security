@@ -15,10 +15,6 @@ public class ProjectConfig {
 
     @Bean
     public UserDetailsService userDetailsService(){
-//        var uds = new InMemoryUserDetailsManager();
-//        var u1 = User.withUsername("lex418").password("12345").authorities("read").build();
-//        uds.createUser(u1);
-//        return uds;
         return new JPAUserDetailsService();
     }
 
