@@ -1,47 +1,40 @@
 package com.lex418.springsecurity.config;
 
-import com.lex418.springsecurity.security.CustomAuthenticationProvider;
-import com.lex418.springsecurity.services.JPAUserDetailsService;
+import com.lex418.springsecurity.security.filters.CustomAuthenticationFilter;
+import com.lex418.springsecurity.security.providers.CustomAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.proxy.NoOp;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.provisioning.JdbcUserDetailsManager;
-
-import javax.sql.DataSource;
+import org.springframework.security.web.authentication.AuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
-public class ProjectConfig extends WebSecurityConfigurerAdapter {
+public class ProjectConfig extends WebSecurityConfigurerAdapter{
 
     @Autowired
-    private CustomAuthenticationProvider customAuthenticationProvider;
+    private CustomAuthenticationFilter filter;
 
+    @Autowired
+    private CustomAuthenticationProvider provider;
+
+    @Override
     @Bean
-    public UserDetailsService userDetailsService(){
-        InMemoryUserDetailsManager userDetailsService = new InMemoryUserDetailsManager();
-        var userDetails = User.withUsername("lex418").password("lex418").authorities("read").build();
-        userDetailsService.createUser(userDetails);
-        return userDetailsService;
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
     }
-
-    @Bean
-    public PasswordEncoder passwordEncoder(){
-         return NoOpPasswordEncoder.getInstance();
-     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(customAuthenticationProvider);
+        auth.authenticationProvider(provider);
+    }
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.addFilterAt(filter, BasicAuthenticationFilter.class);
+        http.authorizeRequests().anyRequest().permitAll();
     }
 }
