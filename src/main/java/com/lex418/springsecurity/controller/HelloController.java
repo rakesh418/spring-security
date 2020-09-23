@@ -12,21 +12,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class HelloController {
 
-    @Autowired
-    private JdbcUserDetailsManager jdbcUserDetailsManager;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @GetMapping("/hello")
     public String hello(){
         return "Hello!";
     }
 
-    @PostMapping("/user")
-    public String  createUser(@RequestBody User user){
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        jdbcUserDetailsManager.createUser(user);
-        return "user successfully created";
-    }
+//    @PostMapping("/user")
+//    public String  createUser(@RequestBody User user){
+//        user.setPassword(passwordEncoder.encode(user.getPassword()));
+//        jdbcUserDetailsManager.createUser(user);
+//        return "user successfully created";
+//    }
 }
